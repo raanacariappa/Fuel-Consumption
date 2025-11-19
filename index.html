@@ -1,0 +1,472 @@
+# Fuel-Consumption
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Fuel Calculator">
+    <title>Fuel Consumption Calculator - RGB Racing UMA</title>
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23FF9800' width='100' height='100'/><text y='70' x='50' text-anchor='middle' font-size='60' fill='white' font-family='Arial'>FC</text></svg>">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+            min-height: 100vh;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            text-align: center;
+        }
+        h1 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .subtitle {
+            font-size: 14px;
+            color: #666;
+        }
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: #555;
+            margin-bottom: 8px;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            font-size: 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            background: #f8f9fa;
+            transition: all 0.3s;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #FF9800;
+            background: white;
+        }
+        .btn {
+            width: 100%;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 10px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 152, 0, 0.4);
+        }
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+        .results {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 15px;
+        }
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        .result-row:last-child {
+            border-bottom: none;
+        }
+        .result-label {
+            font-size: 14px;
+            color: #666;
+        }
+        .result-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: #FF9800;
+        }
+        .highlight-box {
+            background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 15px;
+            text-align: center;
+        }
+        .highlight-title {
+            font-size: 14px;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+        .highlight-value {
+            font-size: 28px;
+            font-weight: 700;
+        }
+        .highlight-unit {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .tab-nav {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .tab-btn {
+            flex: 1;
+            min-width: 100px;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            background: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .tab-btn.active {
+            background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);
+            color: white;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .info-box {
+            background: #fff3e0;
+            border-left: 4px solid #FF9800;
+            padding: 12px;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #555;
+            margin-top: 10px;
+        }
+        .conversion-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        .conversion-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 15px;
+        }
+        .conversion-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #666;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .conversion-result {
+            background: white;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 700;
+            color: #FF9800;
+            margin-top: 10px;
+        }
+        .hidden {
+            display: none;
+        }
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>⛽ Fuel Consumption Calculator</h1>
+            <div class="subtitle">RGB Racing UMA • v2.2 PWA</div>
+        </div>
+        <div class="tab-nav">
+            <button class="tab-btn active" onclick="showTab('params')">Session</button>
+            <button class="tab-btn" onclick="showTab('calculate')">Calculate</button>
+            <button class="tab-btn" onclick="showTab('convert')">Convert</button>
+        </div>
+        <!-- Session Parameters Tab -->
+        <div id="tab-params" class="tab-content active">
+            <div class="card">
+                <div class="section-title">⏱️ Session Parameters</div>
+                <div class="form-group">
+                    <label>Session Duration (min)</label>
+                    <input type="number" id="sessionDuration" value="50" step="1">
+                </div>
+                <div class="form-group">
+                    <label>Average Laptime (s)</label>
+                    <input type="number" id="avgLaptime" value="117.0" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label>Added Laps (OUT/IN)</label>
+                    <input type="number" id="addedLaps" value="4" step="1">
+                </div>
+                <div class="form-group">
+                    <label>Track Distance (km/lap)</label>
+                    <input type="number" id="trackDistance" value="4.2" step="0.001">
+                </div>
+            </div>
+            <div class="card">
+                <div class="section-title">📋 Fuel Requirements</div>
+                <div class="form-group">
+                    <label>Mandatory Fuel (kg)</label>
+                    <input type="number" id="mandatoryFuel" value="3.0" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label>Warm Up (kg)</label>
+                    <input type="number" id="warmUp" value="1.0" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label>Red/Yellow Flag (kg)</label>
+                    <input type="number" id="redYellowFlag" value="5.0" step="0.5">
+                </div>
+                <div class="info-box">
+                    Note: Red/Yellow flag is part of OUT/IN consumption (70% of race pace)
+                </div>
+            </div>
+            <div class="card">
+                <div class="section-title">⛽ Consumption Data</div>
+                <div class="form-group">
+                    <label>Odometer Before (km)</label>
+                    <input type="number" id="odoBefore" value="12000.0" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label>Fuel Level Before (L)</label>
+                    <input type="number" id="fuelBefore" value="70.0" step="0.01">
+                </div>
+                <div class="form-group">
+                    <label>Odometer After (km)</label>
+                    <input type="number" id="odoAfter" value="12500.0" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label>Fuel Level After (L)</label>
+                    <input type="number" id="fuelAfter" value="7.18" step="0.01">
+                </div>
+            </div>
+        </div>
+        <!-- Calculate Tab -->
+        <div id="tab-calculate" class="tab-content">
+            <div class="card">
+                <div class="section-title">🔥 Fuel Density</div>
+                <div class="form-group">
+                    <label>Fuel Density (kg/L)</label>
+                    <input type="number" id="fuelDensity" value="0.755" step="0.001" onchange="calculate()">
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="calculate()">Calculate Fuel Needed</button>
+            <div id="results" class="results hidden">
+                <div class="section-title">📊 Results</div>
+                <div class="result-row">
+                    <span class="result-label">Distance Covered</span>
+                    <span class="result-value" id="distanceCovered">-</span>
+                </div>
+                <div class="result-row">
+                    <span class="result-label">Laps Completed</span>
+                    <span class="result-value" id="lapsCompleted">-</span>
+                </div>
+                <div class="result-row">
+                    <span class="result-label">Fuel Consumed</span>
+                    <span class="result-value" id="fuelConsumed">-</span>
+                </div
+                <div style="margin: 20px 0; border-top: 2px solid #e0e0e0; padding-top: 15px;">
+                    <div class="result-row">
+                        <span class="result-label">Flying Lap (Race Pace)</span>
+                        <span class="result-value" id="flyingLapAvg">-</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">OUT/IN Lap (70%)</span>
+                        <span class="result-value" id="outInLapAvg">-</span>
+                    </div>
+                </div>
+                <div class="highlight-box">
+                    <div class="highlight-title">Recommended Fuel to Add</div>
+                    <div class="highlight-value" id="fuelNeededBase">-</div>
+                    <div class="highlight-unit">Litres (Kilograms)</div>
+                </div>
+                <div style="margin-top: 15px;">
+                    <div class="result-row">
+                        <span class="result-label">With +5% Margin</span>
+                        <span class="result-value" id="fuelNeeded5">-</span>
+                    </div>
+                    <div class="result-row">
+                        <span class="result-label">With +10% Margin</span>
+                        <span class="result-value" id="fuelNeeded10">-</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Convert Tab -->
+        <div id="tab-convert" class="tab-content">
+            <div class="card">
+                <div class="section-title">🔄 Fuel Density Converter</div>
+                <div class="form-group">
+                    <label>Fuel Density (kg/L)</label>
+                    <input type="number" id="convertDensity" value="0.755" step="0.001" onchange="updateConversions()">
+                </div>  
+                <div class="conversion-grid">
+                    <div class="conversion-card">
+                        <div class="conversion-title">LITRES TO KG</div>
+                        <div class="form-group">
+                            <label>Litres</label>
+                            <input type="number" id="litersInput" value="2.0" step="0.01" onchange="convertLToKg()">
+                        </div>
+                        <div class="conversion-result" id="kgResult">1.51 kg</div>
+                    </div>
+                    <div class="conversion-card">
+                        <div class="conversion-title">KG TO LITRES</div>
+                        <div class="form-group">
+                            <label>Kilograms</label>
+                            <input type="number" id="kgInput" value="1.0" step="0.01" onchange="convertKgToL()">
+                        </div>
+                        <div class="conversion-result" id="litersResult">1.32450331 L</div>
+                    </div>
+                </div>
+                <div class="info-box" style="margin-top: 20px; text-align: center;">
+                    <strong>FUEL: 1L = <span id="densitySummary">0.755</span> kg</strong>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+        function showTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(`tab-${tab}`).classList.add('active');
+            event.target.classList.add('active');
+        }
+        function calculate() {
+            // Get inputs
+            const sessionDuration = parseFloat(document.getElementById('sessionDuration').value);
+            const avgLaptime = parseFloat(document.getElementById('avgLaptime').value);
+            const addedLaps = parseFloat(document.getElementById('addedLaps').value);
+            const trackDistance = parseFloat(document.getElementById('trackDistance').value);
+            const mandatoryFuel = parseFloat(document.getElementById('mandatoryFuel').value);
+            const warmUp = parseFloat(document.getElementById('warmUp').value);
+            const redYellowFlag = parseFloat(document.getElementById('redYellowFlag').value);
+            const odoBefore = parseFloat(document.getElementById('odoBefore').value);
+            const fuelBefore = parseFloat(document.getElementById('fuelBefore').value);
+            const odoAfter = parseFloat(document.getElementById('odoAfter').value);
+            const fuelAfter = parseFloat(document.getElementById('fuelAfter').value);
+            const fuelDensity = parseFloat(document.getElementById('fuelDensity').value);   
+            // Calculate consumption
+            const distanceCovered = odoAfter - odoBefore;
+            const fuelConsumedL = fuelBefore - fuelAfter;
+            const fuelConsumedKg = fuelConsumedL * fuelDensity;
+            const lapsCompleted = distanceCovered / trackDistance;
+            // Flying lap average (race pace)
+            const flyingLapAvgL = fuelConsumedL / lapsCompleted;
+            const flyingLapAvgKg = flyingLapAvgL * fuelDensity;
+            // OUT/IN lap (70% of race pace)
+            const outInLapL = flyingLapAvgL * 0.70;
+            const outInLapKg = outInLapL * fuelDensity;
+            const outInTotalKg = outInLapKg * 2;
+            const outInTotalL = outInTotalKg / fuelDensity;
+            // Possible laps
+            const sessionDurationSec = sessionDuration * 60;
+            const possibleLaps = Math.floor(sessionDurationSec / avgLaptime);
+            // Fuel needed
+            const baseFlyingFuelKg = possibleLaps * flyingLapAvgKg;
+            const outInWithFlagKg = outInTotalKg + redYellowFlag;
+            const totalSafetyKg = mandatoryFuel + warmUp + outInWithFlagKg;
+            const fuelNeededBaseKg = baseFlyingFuelKg + totalSafetyKg;
+            const fuelNeededBaseL = fuelNeededBaseKg / fuelDensity;
+            const fuelNeeded5Kg = fuelNeededBaseKg * 1.05;
+            const fuelNeeded5L = fuelNeeded5Kg / fuelDensity;
+            const fuelNeeded10Kg = fuelNeededBaseKg * 1.10;
+            const fuelNeeded10L = fuelNeeded10Kg / fuelDensity;
+            // Display results
+            document.getElementById('distanceCovered').textContent = distanceCovered.toFixed(1) + ' km';
+            document.getElementById('lapsCompleted').textContent = lapsCompleted.toFixed(2) + ' laps';
+            document.getElementById('fuelConsumed').textContent = fuelConsumedL.toFixed(2) + ' L (' + fuelConsumedKg.toFixed(2) + ' kg)';
+            document.getElementById('flyingLapAvg').textContent = flyingLapAvgL.toFixed(2) + ' L/lap (' + flyingLapAvgKg.toFixed(2) + ' kg/lap)';
+            document.getElementById('outInLapAvg').textContent = outInLapL.toFixed(2) + ' L/lap (' + outInLapKg.toFixed(2) + ' kg/lap)';
+            document.getElementById('fuelNeededBase').textContent = fuelNeededBaseL.toFixed(2) + ' L (' + fuelNeededBaseKg.toFixed(2) + ' kg)';
+            document.getElementById('fuelNeeded5').textContent = fuelNeeded5L.toFixed(2) + ' L (' + fuelNeeded5Kg.toFixed(2) + ' kg)';
+            document.getElementById('fuelNeeded10').textContent = fuelNeeded10L.toFixed(2) + ' L (' + fuelNeeded10Kg.toFixed(2) + ' kg)';
+            document.getElementById('results').classList.remove('hidden');
+        }
+        function updateConversions() {
+            const density = parseFloat(document.getElementById('convertDensity').value);
+            document.getElementById('densitySummary').textContent = density.toFixed(3);   
+            // Sync with main calculator
+            document.getElementById('fuelDensity').value = density.toFixed(3);
+            convertLToKg();
+            convertKgToL();
+            // Recalculate if results are visible
+            if (!document.getElementById('results').classList.contains('hidden')) {
+                calculate();
+            }
+        }
+        function convertLToKg() {
+            const density = parseFloat(document.getElementById('convertDensity').value);
+            const liters = parseFloat(document.getElementById('litersInput').value);
+            const kg = liters * density;
+            document.getElementById('kgResult').textContent = kg.toFixed(2) + ' kg';
+        }
+        function convertKgToL() {
+            const density = parseFloat(document.getElementById('convertDensity').value);
+            const kg = parseFloat(document.getElementById('kgInput').value);
+            const liters = kg / density;
+            document.getElementById('litersResult').textContent = liters.toFixed(8) + ' L';
+        }
+        // Initialize conversions
+        updateConversions();
+        // Install prompt
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+        });
+    </script>
+</body>
+</html>
